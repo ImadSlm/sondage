@@ -2,8 +2,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sondage/vote_provider.dart';
 
 class SondageScreen extends StatelessWidget {
   SondageScreen({super.key});
@@ -29,7 +30,7 @@ class SondageScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                vote("apple");
+                Provider.of<VoteProvider>(context, listen: false).vote("apple");
               },
               child: Row(
                 children: [
@@ -40,7 +41,7 @@ class SondageScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                vote("windows");
+                Provider.of<VoteProvider>(context, listen: false).vote("windows");
               },
               child: Row(
                 children: [
@@ -60,19 +61,5 @@ class SondageScreen extends StatelessWidget {
     );
   }
 
-  Future vote(String selection) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection("sondage");
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list.first;
-    final id = document.id;
-    if (selection == "windows") {
-      int windowsVotes = document.get("windows");
-      collection.doc(id).update({"windows": ++windowsVotes});
-    } else if (selection == "apple") {
-      int appleVotes = document.get("apple");
-      collection.doc(id).update({"apple": ++appleVotes});
-    }
-  }
+  
 }
