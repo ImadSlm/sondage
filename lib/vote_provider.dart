@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class VoteProvider extends ChangeNotifier {
   int appleVotes = 0;
   int windowsVotes = 0;
+  bool hasVoted = false;
 
   VoteProvider() {
     FirebaseFirestore.instance.collection("sondage").snapshots().listen((event) {
@@ -28,7 +29,7 @@ class VoteProvider extends ChangeNotifier {
       int appleVotes = document.get("apple");
       collection.doc(id).update({"apple": ++appleVotes});
     }
-
+    hasVoted = true;
     notifyListeners();
   }
 }

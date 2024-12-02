@@ -16,18 +16,34 @@ class SondageScreen extends StatelessWidget {
         padding: EdgeInsets.all(96),
         child: Column(
           children: [
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection("sondage").snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+            // StreamBuilder<QuerySnapshot>(
+            //   stream: FirebaseFirestore.instance.collection("sondage").snapshots(),
+            //   builder: (context, snapshot) {
+            //     if (!snapshot.hasData) {
+            //       return CircularProgressIndicator();
+            //     }
+            //     if (hasVoted) {
+            //       return Text("Veuillez voter");
+            //     }
+            //     var appleVotes = snapshot.data!.docs.first.get("apple");
+            //     var windowsVotes = snapshot.data!.docs.first.get("windows");
+            //     var totalVotes = appleVotes + windowsVotes;
+            //     var percentage = 100 / totalVotes;
+            //     return Text(
+            //       "Apple - ${(appleVotes * percentage).toStringAsFixed(1)}%    |     Windows - ${(windowsVotes * percentage).toStringAsFixed(1)}%\nTotal votes: $totalVotes",
+            //     );
+            //   },
+            // ),
+            Consumer<VoteProvider>(
+              builder: (context, voteProvider, child) {
+                if (!voteProvider.hasVoted) {
+                  return Text("Veuillez voter pour voir les résultats.");
                 }
-                var appleVotes = snapshot.data!.docs.first.get("apple");
-                var windowsVotes = snapshot.data!.docs.first.get("windows");
-                var totalVotes = appleVotes + windowsVotes;
-                var percentage = 100 / totalVotes;
+                var totalVotes = voteProvider.appleVotes + voteProvider.windowsVotes;
+                var applePercentage = (voteProvider.appleVotes * 100 / totalVotes).toStringAsFixed(1);
+                var windowsPercentage = (voteProvider.windowsVotes * 100 / totalVotes).toStringAsFixed(1);
                 return Text(
-                  "Apple - ${(appleVotes * percentage).toStringAsFixed(1)}%    |     Windows - ${(windowsVotes * percentage).toStringAsFixed(1)}%\nTotal votes: $totalVotes",
+                  "Apple - $applePercentage%    |     Windows - $windowsPercentage%\nTotal votes: $totalVotes",
                 );
               },
             ),
