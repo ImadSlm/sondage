@@ -15,11 +15,13 @@ class SondageScreen extends StatelessWidget {
         padding: EdgeInsets.all(96),
         child: Column(
           children: [
-            StreamBuilder<Object>(
+            StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance.collection("sondage").snapshots(),
               builder: (context, snapshot) {
-                return Text("Votes : Apple - ${showVotes("apple").toString()}, Windows - ${showVotes("windows")}");
-              }
+                var appleVotes = snapshot.data!.docs.first.get("apple");
+                var windowsVotes = snapshot.data!.docs.first.get("windows");
+                return Text("Votes : Apple - $appleVotes, Windows - $windowsVotes");
+              },
             ),
             ElevatedButton(
               onPressed: () {
@@ -67,22 +69,6 @@ class SondageScreen extends StatelessWidget {
     } else if (selection == "apple") {
       int appleVotes = document.get("apple");
       collection.doc(id).update({"apple": ++appleVotes});
-    }
-  }
-
-  Future showVotes(String selection) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection("sondage");
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list.first;
-    final id = document.id;
-    if (selection == "windows") {
-      int windowsVotes = document.get("windows");
-      return windowsVotes;
-    } else if (selection == "apple") {
-      int appleVotes = document.get("apple");
-      return appleVotes;
     }
   }
 }
