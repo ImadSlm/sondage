@@ -18,9 +18,13 @@ class SondageScreen extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance.collection("sondage").snapshots(),
               builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return CircularProgressIndicator();
+                }
                 var appleVotes = snapshot.data!.docs.first.get("apple");
                 var windowsVotes = snapshot.data!.docs.first.get("windows");
-                return Text("Votes : Apple - $appleVotes, Windows - $windowsVotes");
+                return Text(
+                    "Apple - ${(appleVotes * 100 / (appleVotes + windowsVotes)).toStringAsFixed(1)}%    |     Windows - ${(windowsVotes * 100 / (appleVotes + windowsVotes)).toStringAsFixed(1)}%\nTotal votes: ${appleVotes + windowsVotes}");
               },
             ),
             ElevatedButton(
