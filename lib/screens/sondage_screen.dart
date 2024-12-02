@@ -24,8 +24,11 @@ class SondageScreen extends StatelessWidget {
                 }
                 var appleVotes = snapshot.data!.docs.first.get("apple");
                 var windowsVotes = snapshot.data!.docs.first.get("windows");
+                var totalVotes = appleVotes + windowsVotes;
+                var percentage = 100 / totalVotes;
                 return Text(
-                    "Apple - ${(appleVotes * 100 / (appleVotes + windowsVotes)).toStringAsFixed(1)}%    |     Windows - ${(windowsVotes * 100 / (appleVotes + windowsVotes)).toStringAsFixed(1)}%\nTotal votes: ${appleVotes + windowsVotes}");
+                  "Apple - ${(appleVotes * percentage).toStringAsFixed(1)}%    |     Windows - ${(windowsVotes * percentage).toStringAsFixed(1)}%\nTotal votes: $totalVotes",
+                );
               },
             ),
             ElevatedButton(
@@ -60,6 +63,4 @@ class SondageScreen extends StatelessWidget {
       ),
     );
   }
-
-  
 }
