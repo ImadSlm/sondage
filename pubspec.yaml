@@ -33,16 +33,12 @@ dependencies:
   firebase_auth: ^5.3.3
   firebase_core: ^3.8.0
   firebase_ui_auth: ^1.16.0
+  fl_chart: ^0.69.2
   flutter:
     sdk: flutter
+  provider: ^6.1.2
 
 dev_dependencies:
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter

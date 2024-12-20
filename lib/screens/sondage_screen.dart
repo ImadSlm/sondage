@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sondage/vote_provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class SondageScreen extends StatelessWidget {
   SondageScreen({super.key});
@@ -15,15 +16,28 @@ class SondageScreen extends StatelessWidget {
         padding: EdgeInsets.all(96),
         child: Column(
           children: [
-            StreamBuilder<Object>(
-              stream: FirebaseFirestore.instance.collection("sondage").snapshots(),
-              builder: (context, snapshot) {
-                return Text("Votes : Apple - ${showVotes("apple").toString()}, Windows - ${showVotes("windows")}");
-              }
+            Consumer<VoteProvider>(
+              builder: (context, voteProvider, child) {
+                if (!voteProvider.hasVoted) {
+                  return Text("Veuillez voter pour voir les résultats :");
+                }
+                var totalVotes = voteProvider.appleVotes + voteProvider.windowsVotes;
+                var applePercentage = (voteProvider.appleVotes * 100 / totalVotes).toStringAsFixed(1);
+                var windowsPercentage = (voteProvider.windowsVotes * 100 / totalVotes).toStringAsFixed(1);
+                return Column(
+                  children: [
+                    Text(
+                      "Apple - $applePercentage%    |     Windows - $windowsPercentage%\nTotal votes: $totalVotes",
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                );
+              },
             ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                vote("apple");
+                Provider.of<VoteProvider>(context, listen: false).vote("apple");
               },
               child: Row(
                 children: [
@@ -34,7 +48,7 @@ class SondageScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                vote("windows");
+                Provider.of<VoteProvider>(context, listen: false).vote("windows");
               },
               child: Row(
                 children: [
@@ -52,37 +66,5 @@ class SondageScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future vote(String selection) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection("sondage");
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list.first;
-    final id = document.id;
-    if (selection == "windows") {
-      int windowsVotes = document.get("windows");
-      collection.doc(id).update({"windows": ++windowsVotes});
-    } else if (selection == "apple") {
-      int appleVotes = document.get("apple");
-      collection.doc(id).update({"apple": ++appleVotes});
-    }
-  }
-
-  Future showVotes(String selection) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection("sondage");
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list.first;
-    final id = document.id;
-    if (selection == "windows") {
-      int windowsVotes = document.get("windows");
-      return windowsVotes;
-    } else if (selection == "apple") {
-      int appleVotes = document.get("apple");
-      return appleVotes;
-    }
   }
 }
